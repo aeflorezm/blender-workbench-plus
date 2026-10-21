@@ -12,8 +12,10 @@ so it can be enabled or disabled independently from the add-on preferences.
 import importlib
 
 import bpy
-from bpy.props import BoolProperty
+from bpy.props import BoolProperty, PointerProperty
 from bpy.types import AddonPreferences
+
+from . import command_server
 
 # Sub-module name, label and description of every feature, in display order.
 # Each one has a matching `use_<name>` toggle in the add-on preferences.
@@ -88,6 +90,10 @@ class WorkbenchPlusPreferences(AddonPreferences):
     use_script_editor: _feature_toggle(*FEATURES[4])
     use_driven_keys: _feature_toggle(*FEATURES[5])
 
+    # Settings of the features. They are registered with the preferences (not by the features),
+    # so they are kept while a feature is turned off.
+    command_server: PointerProperty(type=command_server.CommandServerSettings)
+
     def draw(self, _context):
         layout = self.layout
         layout.use_property_split = True
@@ -97,6 +103,12 @@ class WorkbenchPlusPreferences(AddonPreferences):
         for name in FEATURE_NAMES:
             col.prop(self, "use_" + name)
 
+        if feature_is_registered("command_server"):
+            layout.separator()
+            box = layout.box()
+            box.label(text="Command Server")
+            command_server.draw_settings(box, self.command_server)
+
 
 def _preferences():
     # The add-on is only listed in the preferences when enabled with `default_set`,
@@ -105,7 +117,15 @@ def _preferences():
     return addon.preferences if addon else None
 
 
+# Property groups used by `WorkbenchPlusPreferences`, registered before it.
+_settings_classes = (
+    command_server.CommandServerSettings,
+)
+
+
 def register():
+    for cls in _settings_classes:
+        bpy.utils.register_class(cls)
     bpy.utils.register_class(WorkbenchPlusPreferences)
 
     prefs = _preferences()
@@ -119,3 +139,5 @@ def unregister():
         feature_unregister(name)
 
     bpy.utils.unregister_class(WorkbenchPlusPreferences)
+    for cls in reversed(_settings_classes):
+        bpy.utils.unregister_class(cls)
