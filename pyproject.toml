@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2026 Blender Workbench Plus Authors
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# Same formatting rules as Blender (see `pyproject.toml` in the Blender repository).
+
+[tool.autopep8]
+max_line_length = 120
+ignore = [
+    "E721",
+    "E722",
+    "E402",
+    "W690",
+]
+aggressive = 2
+

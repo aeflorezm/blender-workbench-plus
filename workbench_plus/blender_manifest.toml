@@ -1,0 +1,28 @@
+schema_version = "1.0.0"
+
+id = "workbench_plus"
+version = "0.0.1"
+name = "Workbench Plus"
+tagline = "Workflow and pipeline tools for animators and technical artists"
+maintainer = "Blender Workbench Plus Authors"
+type = "add-on"
+
+website = "https://github.com/aeflorezm/blender-workbench-plus"
+
+tags = ["Animation", "Development", "Pipeline"]
+
+blender_version_min = "5.2.0"
+
+license = [
+  "SPDX:GPL-2.0-or-later",
+]
+copyright = [
+  "2026 Blender Workbench Plus Authors",
+]
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  "/.git/",
+  "/*.zip",
+]
