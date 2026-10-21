@@ -3,7 +3,6 @@ __pycache__/
 /build/
 /dist/
 *.zip
-/test-results/
 .vscode/
 .idea/
 
