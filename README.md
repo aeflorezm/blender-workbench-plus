@@ -1,5 +1,7 @@
 # Blender Workbench Plus
 
+[![Tests](https://github.com/aeflorezm/blender-workbench-plus/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/aeflorezm/blender-workbench-plus/actions/workflows/tests.yml)
+
 Workflow and pipeline tools for Blender, built to the same quality bar as Blender itself.
 
 > **Status:** early development. Nothing to install yet.
@@ -47,6 +49,10 @@ Inside Blender, without the launcher:
 blender -b --factory-startup --python tools/run_tests.py -- -k toggle
 blender --command extension validate workbench_plus
 ```
+
+Every push to `main` and every pull request runs the same suite in the latest official Blender 5.2 LTS
+release on Linux ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)); the JUnit report is attached
+to each run.
 
 Python code follows Blender's formatting rules (`autopep8` with the settings in [`pyproject.toml`](pyproject.toml)).
 
