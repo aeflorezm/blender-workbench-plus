@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: 2026 Blender Workbench Plus Authors
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+# Validate the extension manifest and run the test suite in an official Blender release, headless,
+# with the same strict settings as Blender's own Python tests (see `tools/test.py`).
+
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request makes older runs obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Latest official Blender 5.2 LTS release, checksum from `blender-<version>.sha256` on the download server.
+  BLENDER_VERSION: "5.2.2"
+  BLENDER_SHA256: "84098912789dc450e95697c4184fb8a90acbe5111c2ba4aede3fecb57806a168"
+
+jobs:
+  tests:
+    name: Blender 5.2 LTS (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install system libraries needed by Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libegl1 libgl1 libice6 libsm6 libx11-6 libxext6 libxfixes3 libxi6 \
+            libxkbcommon0 libxrender1 libxxf86vm1
+
+      - name: Restore Blender from cache
+        id: blender-cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/blender
+          key: blender-${{ env.BLENDER_VERSION }}-linux-x64
+
+      - name: Download Blender
+        if: steps.blender-cache.outputs.cache-hit != 'true'
+        run: |
+          archive="blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          curl --fail --location --retry 3 --output "${RUNNER_TEMP}/${archive}" \
+            "https://download.blender.org/release/Blender${BLENDER_VERSION%.*}/${archive}"
+          echo "${BLENDER_SHA256}  ${RUNNER_TEMP}/${archive}" | sha256sum --check
+          mkdir -p "${RUNNER_TEMP}/blender"
+          tar -xf "${RUNNER_TEMP}/${archive}" -C "${RUNNER_TEMP}/blender" --strip-components=1
+          rm "${RUNNER_TEMP}/${archive}"
+
+      - name: Blender version
+        run: '"${RUNNER_TEMP}/blender/blender" --factory-startup --version'
+
+      - name: Validate manifest and run tests
+        run: python tools/test.py --validate --blender "${RUNNER_TEMP}/blender/blender"
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: build/test-results/junit.xml
+          if-no-files-found: warn
