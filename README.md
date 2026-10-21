@@ -9,10 +9,10 @@ Workflow and pipeline tools for Blender, built to the same quality bar as Blende
 ## Features
 
 - **Command Server:** a built-in remote control server for Blender (JSON-RPC over localhost, token auth, structured errors, batching, notifications) for IDEs, pipelines and AI agents. See [Command Server](#command-server).
+- **Depsgraph Inspector:** see what gets re-evaluated, what the active object depends on, and how long each frame takes; export traces to Perfetto. See [Depsgraph Inspector](#depsgraph-inspector).
 
 ## Planned features
 
-- **Depsgraph Inspector:** see what gets re-evaluated, why, and how long it takes; export traces to Perfetto.
 - **Quick Attributes:** fast multi-object channel editing with virtual sliders.
 - **Shelves:** shareable button bars for your own scripts and operators.
 - **Script Editor with command echo:** see the Python behind every UI action.
@@ -40,6 +40,21 @@ with Client.from_discovery_file(path_to_command_server_json) as blender:
 ```
 
 The protocol (methods, values, error codes, events) is described in [`docs/command_server.md`](docs/command_server.md).
+
+## Depsgraph Inspector
+
+*3D Viewport → Sidebar → Workbench → Depsgraph Inspector*
+
+- **Record** lists the data-blocks each evaluation updated, with what changed (transform, geometry, shading)
+  and how long it took. Recording only installs its handlers while it is on.
+- **Relations** shows the data-blocks the active object uses (parent, constraint and modifier targets, drivers,
+  action...) and the ones that use it, with a button to re-evaluate any of them and time it.
+- **Profile** steps through the scene's frame range, then lists the slowest frames and the data-blocks updated
+  in the most expensive evaluations. *Export Recording* saves it as JSON or as a Chrome trace that opens in
+  [Perfetto](https://ui.perfetto.dev).
+
+Times are measured per evaluation: Python has no hooks inside the evaluation of each object, so the ranking of
+data-blocks points at suspects rather than splitting the time between them.
 
 ## Development
 
