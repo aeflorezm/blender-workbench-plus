@@ -201,7 +201,8 @@ class Dispatcher:
             compiled = compile(code, "<command_server>", "exec")
             with contextlib.redirect_stdout(stdout):
                 exec(compiled, self.namespace)
-        except Exception as ex:
+        # `SystemExit` (e.g. `sys.exit()` in the code) must not stop the server.
+        except (Exception, SystemExit) as ex:
             raise _python_error(ex)
         return {"stdout": stdout.getvalue()}
 
@@ -209,7 +210,7 @@ class Dispatcher:
         expression = _param(params, "expression", str)
         try:
             value = eval(compile(expression, "<command_server>", "eval"), self.namespace)
-        except Exception as ex:
+        except (Exception, SystemExit) as ex:
             raise _python_error(ex)
         return value_to_json(value)
 

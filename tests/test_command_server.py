@@ -374,6 +374,12 @@ class ErrorsTest(CommandServerTestCase):
         error = self.assertServerError(PYTHON_EXCEPTION, "eval", expression="undefined_name")
         self.assertEqual(error.data["type"], "NameError")
 
+    def test_system_exit(self):
+        error = self.assertServerError(PYTHON_EXCEPTION, "exec", code="import sys; sys.exit(3)")
+        self.assertEqual(error.data["type"], "SystemExit")
+        self.assertTrue(self.cs.is_running())
+        self.assertEqual(self.call("ping"), "pong")
+
     def test_server_survives_errors(self):
         def function():
             with self.connect() as client:
