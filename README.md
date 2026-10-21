@@ -50,6 +50,14 @@ blender -b --factory-startup --python tools/run_tests.py -- -k toggle
 blender --command extension validate workbench_plus
 ```
 
+Build the installable package (`dist/workbench_plus-<version>.zip`, install it from
+*Preferences → Get Extensions → Install from Disk*):
+
+```
+python tools/build_extension.py                   # Into dist/.
+python tools/build_extension.py --output-dir DIR  # Into DIR (created when missing).
+```
+
 Every push to `main` and every pull request runs the same suite in the latest official Blender 5.2 LTS
 release on Linux ([`.github/workflows/tests.yml`](.github/workflows/tests.yml)); the JUnit report is attached
 to each run.
