@@ -10,10 +10,10 @@ Workflow and pipeline tools for Blender, built to the same quality bar as Blende
 
 - **Command Server:** a built-in remote control server for Blender (JSON-RPC over localhost, token auth, structured errors, batching, notifications) for IDEs, pipelines and AI agents. See [Command Server](#command-server).
 - **Depsgraph Inspector:** see what gets re-evaluated, what the active object depends on, and how long each frame takes; export traces to Perfetto. See [Depsgraph Inspector](#depsgraph-inspector).
+- **Quick Attributes:** fast multi-object channel editing with virtual sliders. See [Quick Attributes](#quick-attributes).
 
 ## Planned features
 
-- **Quick Attributes:** fast multi-object channel editing with virtual sliders.
 - **Shelves:** shareable button bars for your own scripts and operators.
 - **Script Editor with command echo:** see the Python behind every UI action.
 - **Driven Keys UI:** create driver relationships by posing, without writing expressions.
@@ -55,6 +55,18 @@ The protocol (methods, values, error codes, events) is described in [`docs/comma
 
 Times are measured per evaluation: Python has no hooks inside the evaluation of each object, so the ranking of
 data-blocks points at suspects rather than splitting the time between them.
+
+## Quick Attributes
+
+*3D Viewport → Sidebar → Workbench → Quick Attributes*
+
+- Shows the location, rotation and scale channels of the active object; editing a value sets it on **every
+  selected object**. Locked channels are skipped.
+- **Click a channel name** (X, Y, Z) and move the mouse to offset that channel on every selected object, each
+  keeping its own value; click to confirm, right-click or Esc to cancel. Hold Shift for finer changes, Ctrl for steps.
+- The ▾ button of each channel keys it, keys a breakdown, locks/unlocks it or mutes/unmutes its animation,
+  on every selected object.
+- Numeric custom properties of the active object are listed too, with a button to copy each one to the selection.
 
 ## Development
 
