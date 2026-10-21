@@ -21,23 +21,32 @@ The extension lives in [`workbench_plus/`](workbench_plus). Each feature is a su
 `register()`/`unregister()` and can be turned on or off under
 *Preferences → Add-ons → Workbench Plus → Features*.
 
-Validate the extension manifest:
+Run the test suite (Blender 5.2 LTS or newer, Python 3.10 or newer to launch it):
 
 ```
-blender --command extension validate workbench_plus
+python tools/test.py                              # The whole suite.
+python tools/test.py --validate                   # Validate the extension manifest first.
+python tools/test.py -k toggle                    # Only tests matching "toggle".
+python tools/test.py --pattern "test_reg*.py"     # Only some test files.
+python tools/test.py --blender PATH/TO/blender    # A specific Blender binary.
 ```
 
-Run the test suite (Blender 5.2 LTS or newer):
-
-```
-blender -b --factory-startup --python tools/run_tests.py
-blender -b --factory-startup --python tools/run_tests.py -- -k toggle   # Only tests matching "toggle".
-blender -b --factory-startup --python tests/test_registration.py         # A single test file.
-```
+The Blender binary is taken from `--blender`, then the `BLENDER_BIN` environment variable,
+then a local build, then `blender` in the `PATH`.
+Tests run with the same strict settings as Blender's own Python tests
+(`--factory-startup --debug-memory --debug-exit-on-error --python-exit-code 1`), so memory leaks
+and Python errors fail the run. See `python tools/test.py --help` for all options.
 
 The runner loads the extension straight from this source tree (as a temporary local extension repository),
 starts every test from an empty file, writes a JUnit report to `build/test-results/junit.xml`
 and exits with a non-zero code when a test fails.
+
+Inside Blender, without the launcher:
+
+```
+blender -b --factory-startup --python tools/run_tests.py -- -k toggle
+blender --command extension validate workbench_plus
+```
 
 Python code follows Blender's formatting rules (`autopep8` with the settings in [`pyproject.toml`](pyproject.toml)).
 
