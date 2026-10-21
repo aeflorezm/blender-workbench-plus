@@ -4,11 +4,14 @@
 
 Workflow and pipeline tools for Blender, built to the same quality bar as Blender itself.
 
-> **Status:** early development. Nothing to install yet.
+> **Status:** early development. Build the package with `python tools/build_extension.py` (see *Development*).
+
+## Features
+
+- **Command Server:** a built-in remote control server for Blender (JSON-RPC over localhost, token auth, structured errors, batching, notifications) for IDEs, pipelines and AI agents. See [Command Server](#command-server).
 
 ## Planned features
 
-- **Command Server:** a built-in remote control server for Blender (JSON-RPC over localhost, token auth, structured errors, batching, notifications) for IDEs, pipelines and AI agents.
 - **Depsgraph Inspector:** see what gets re-evaluated, why, and how long it takes; export traces to Perfetto.
 - **Quick Attributes:** fast multi-object channel editing with virtual sliders.
 - **Shelves:** shareable button bars for your own scripts and operators.
@@ -16,6 +19,27 @@ Workflow and pipeline tools for Blender, built to the same quality bar as Blende
 - **Driven Keys UI:** create driver relationships by posing, without writing expressions.
 
 Most features ship as a regular **Blender extension** (works on stock Blender 5.2 LTS). Features that need core changes live in a separate Blender branch, and generally useful improvements are proposed upstream to Blender.
+
+## Command Server
+
+Lets other programs control a running Blender: run Python, call operators, read and write properties
+(also in batches that undo as one step) and receive events such as frame changes or file loads.
+
+- Start it from *Preferences → Add-ons → Workbench Plus → Command Server* (or enable *Start Automatically*).
+  It only listens on `127.0.0.1`.
+- Headless: `blender -b --python-expr "import bpy; bpy.ops.wbp.command_server_serve()"` serves until a client
+  sends `shutdown`.
+- Clients read the port and a per-session token from `command_server.json` in the add-on's user directory.
+
+```python
+from client import Client  # workbench_plus/command_server/client.py, a single file without dependencies.
+
+with Client.from_discovery_file(path_to_command_server_json) as blender:
+    blender.call("call_operator", operator="mesh.primitive_cube_add", properties={"location": [0, 0, 1]})
+    print(blender.call("get_property", path="active_object.location", root="context"))
+```
+
+The protocol (methods, values, error codes, events) is described in [`docs/command_server.md`](docs/command_server.md).
 
 ## Development
 
