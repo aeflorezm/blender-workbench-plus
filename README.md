@@ -4,7 +4,17 @@
 
 Workflow and pipeline tools for Blender, built to the same quality bar as Blender itself.
 
-> **Status:** early development. Build the package with `python tools/build_extension.py` (see *Development*).
+*[Leer en español](README.es.md)*
+
+> **Status:** early development, for Blender 5.2 LTS. Feedback is welcome in the issues.
+
+## Install
+
+1. Download `workbench_plus-<version>.zip` from the [Releases](https://github.com/aeflorezm/blender-workbench-plus/releases)
+   (or build it, see *Development*).
+2. In Blender: *Edit → Preferences → Get Extensions → ⌄ → Install from Disk*, and pick the zip.
+3. The panels are in the 3D Viewport sidebar (N), *Workbench* tab. Each feature can be turned off in
+   *Preferences → Add-ons → Workbench Plus*.
 
 ## Features
 
@@ -42,6 +52,8 @@ The protocol (methods, values, error codes, events) is described in [`docs/comma
 
 *3D Viewport → Sidebar → Workbench → Depsgraph Inspector*
 
+<img src="docs/images/depsgraph.png" alt="Depsgraph Inspector: last evaluation and the slowest frames of a profile" width="246" align="right">
+
 - **Record** lists the data-blocks each evaluation updated, with what changed (transform, geometry, shading)
   and how long it took. Recording only installs its handlers while it is on.
 - **Relations** shows the data-blocks the active object uses (parent, constraint and modifier targets, drivers,
@@ -52,10 +64,13 @@ The protocol (methods, values, error codes, events) is described in [`docs/comma
 
 Times are measured per evaluation: Python has no hooks inside the evaluation of each object, so the ranking of
 data-blocks points at suspects rather than splitting the time between them.
+<br clear="right">
 
 ## Quick Attributes
 
 *3D Viewport → Sidebar → Workbench → Quick Attributes*
+
+<img src="docs/images/quick_attributes.png" alt="Quick Attributes: transform channels of three selected objects" width="246" align="right">
 
 - Shows the location, rotation and scale channels of the active object; editing a value sets it on **every
   selected object**. Locked channels are skipped.
@@ -64,10 +79,13 @@ data-blocks points at suspects rather than splitting the time between them.
 - The ▾ button of each channel keys it, keys a breakdown, locks/unlocks it or mutes/unmutes its animation,
   on every selected object.
 - Numeric custom properties of the active object are listed too, with a button to copy each one to the selection.
+<br clear="right">
 
 ## Shelves
 
 *3D Viewport → Sidebar → Workbench → Shelves*
+
+<img src="docs/images/shelves.png" alt="Shelves: tabs and buttons" width="246" align="right">
 
 - Tabs of buttons; each button runs an **operator** (with properties given as JSON) or a **Python script**,
   with its own icon and tooltip. The gear icon shows the controls to rename, reorder and remove.
@@ -75,6 +93,7 @@ data-blocks points at suspects rather than splitting the time between them.
 - Shelves are saved to `shelves.json` in the add-on's user directory after every change.
   *Export* writes the shown shelf (or all of them) to a file that others can *Import*;
   shelves with a name that already exists are renamed, or replaced with the *Replace* option.
+<br clear="right">
 
 ## Script Editor
 
@@ -89,9 +108,13 @@ data-blocks points at suspects rather than splitting the time between them.
 
 The log is a regular text data-block, so it is saved with the file; clear it with the trash button.
 
+![Script Editor: the Script Log with echoed operators and property changes, and a run](docs/images/script_editor.png)
+
 ## Driven Keys
 
 *3D Viewport → Sidebar → Workbench → Driven Keys*
+
+<img src="docs/images/driven_keys.png" alt="Driven Keys: a handle driving a door" width="246" align="right">
 
 1. Choose the driver channel (e.g. *Rotation X*) and *Load Driver*: it uses the active object, or the active
    bone in Pose Mode.
@@ -101,6 +124,7 @@ The log is a regular text data-block, so it is saved with the file; clear it wit
 
 Each driven channel gets a regular Blender driver whose F-curve maps driver values to driven values, so it can
 also be refined in the Drivers editor. *Relationships* lists them, to load one again for more keys or remove it.
+<br clear="right">
 
 ## Development
 
@@ -148,10 +172,6 @@ release on Linux ([`.github/workflows/tests.yml`](.github/workflows/tests.yml));
 to each run.
 
 Python code follows Blender's formatting rules (`autopep8` with the settings in [`pyproject.toml`](pyproject.toml)).
-
-## Español
-
-Herramientas de flujo de trabajo y pipeline para Blender. La mayoría se instala como extensión normal; lo que necesita cambios en el núcleo vive en una rama aparte de Blender, y las mejoras de interés general se proponen a Blender oficial.
 
 ## License
 
