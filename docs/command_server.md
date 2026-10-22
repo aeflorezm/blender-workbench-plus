@@ -109,3 +109,35 @@ After `subscribe`, the server sends notifications (no `id`) to that connection:
 | `save_post` | `filepath` | After the file is saved |
 | `undo_post`, `redo_post` | — | After undo or redo |
 | `progress` | `value` (0–1), `message` | Sent by Python run with `exec`, through `notify_progress(value, message)` |
+
+## MCP server
+
+[`workbench_plus/command_server/mcp_server.py`](../workbench_plus/command_server/mcp_server.py) exposes the
+Command Server to AI assistants through the [Model Context Protocol](https://modelcontextprotocol.io)
+(stdio transport, protocol versions 2024-11-05 to 2025-11-25). It is a single script without dependencies
+besides `client.py` next to it, run with any Python 3.10+:
+
+```
+python mcp_server.py --discovery <path to command_server.json> [--timeout SECONDS]
+```
+
+The discovery path can also be given with the `WBP_COMMAND_SERVER_DISCOVERY` environment variable.
+*Preferences → Add-ons → Workbench Plus → Command Server → Copy Command / Copy JSON* copies the exact command
+(with Blender's own Python and this Blender's discovery file), or an `mcpServers` configuration entry.
+
+Every tool call connects to the server described by the discovery file at that moment (reconnecting when
+Blender or the server restarted), so the MCP server can start before Blender. When the server is not running,
+tool calls return an error that says how to start it.
+
+| Tool | Arguments | Forwards to |
+|---|---|---|
+| `scene_summary` | — | File, scene, frame, mode, active object and objects (type, parent, collections, location, selection, visibility; up to 500) |
+| `run_python` | `code` | `exec`; returns what the code prints |
+| `evaluate` | `expression` | `eval`; returns the value as JSON |
+| `call_operator` | `operator`, `properties`, `execution_context` | `call_operator` (pushes an undo step) |
+| `get_property` | `path`, `root` | `get_property` |
+| `set_property` | `path`, `value`, `root` | `set_property` |
+| `batch` | `calls`, `undo` | `batch` (one undo step) |
+
+Errors of the Command Server (including Python tracebacks) are returned as tool results with `isError`,
+so the assistant can read and correct them.

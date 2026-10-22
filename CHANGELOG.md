@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Command Server:** MCP server (`mcp_server.py`, stdio, no dependencies) so AI assistants that support the
+  Model Context Protocol can drive Blender; *Copy Command* / *Copy JSON* in the preferences.
+
 ## 0.1.0 (2026-10-21)
 
 First release, for Blender 5.2 LTS.
