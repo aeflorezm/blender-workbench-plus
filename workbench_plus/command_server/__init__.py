@@ -35,6 +35,7 @@ from bpy.app.handlers import persistent
 from bpy.props import BoolProperty, FloatProperty, IntProperty
 from bpy.types import Operator, PropertyGroup
 
+from ..utils import classes_register, classes_unregister
 from . import protocol
 from .methods import Dispatcher, value_to_json
 from .server import HOST, Server
@@ -390,8 +391,7 @@ def _autostart():
 
 
 def register():
-    for cls in _classes:
-        bpy.utils.register_class(cls)
+    classes_register(_classes)
     if not bpy.app.background:
         # Deferred: the preferences and a full context are not available while add-ons are being enabled.
         bpy.app.timers.register(_autostart, first_interval=0.0)
@@ -401,5 +401,4 @@ def unregister():
     if bpy.app.timers.is_registered(_autostart):
         bpy.app.timers.unregister(_autostart)
     server_stop()
-    for cls in reversed(_classes):
-        bpy.utils.unregister_class(cls)
+    classes_unregister(_classes)

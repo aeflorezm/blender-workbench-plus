@@ -28,7 +28,7 @@ from bpy.app.handlers import persistent
 from bpy.props import BoolProperty
 from bpy.types import Operator, Panel, PropertyGroup
 
-from ..utils import selected_text
+from ..utils import classes_register, classes_unregister, selected_text
 from .echo import WATCHED_PROPERTIES, PropertyWatcher, ReportReader
 
 LOG_TEXT_NAME = "Script Log"
@@ -271,8 +271,7 @@ _keymaps = []
 
 
 def register():
-    for cls in _classes:
-        bpy.utils.register_class(cls)
+    classes_register(_classes)
     bpy.types.WindowManager.wbp_script_editor = bpy.props.PointerProperty(type=ScriptEditorSettings)
     bpy.app.handlers.load_post.append(_on_load_post)
 
@@ -293,5 +292,4 @@ def unregister():
     bpy.app.handlers.load_post.remove(_on_load_post)
     _namespace.clear()
     del bpy.types.WindowManager.wbp_script_editor
-    for cls in reversed(_classes):
-        bpy.utils.unregister_class(cls)
+    classes_unregister(_classes)

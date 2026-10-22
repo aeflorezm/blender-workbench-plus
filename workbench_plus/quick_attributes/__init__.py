@@ -28,6 +28,7 @@ from typing import NamedTuple
 import bpy
 from bpy.props import EnumProperty, FloatProperty, PointerProperty, StringProperty
 from bpy.types import Operator, Panel, PropertyGroup
+from ..utils import classes_register, classes_unregister
 from bpy_extras import anim_utils
 
 
@@ -409,12 +410,10 @@ _classes = (
 
 
 def register():
-    for cls in _classes:
-        bpy.utils.register_class(cls)
+    classes_register(_classes)
     bpy.types.Scene.wbp_quick_attributes = PointerProperty(type=QuickAttributesProperties)
 
 
 def unregister():
     del bpy.types.Scene.wbp_quick_attributes
-    for cls in reversed(_classes):
-        bpy.utils.unregister_class(cls)
+    classes_unregister(_classes)

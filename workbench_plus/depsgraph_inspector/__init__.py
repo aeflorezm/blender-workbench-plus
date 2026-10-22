@@ -26,6 +26,7 @@ from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
 from bpy.types import Operator, Panel, PropertyGroup
 from bpy_extras.io_utils import ExportHelper
 
+from ..utils import classes_register, classes_unregister
 from . import relations
 from .recorder import Recorder
 
@@ -395,8 +396,7 @@ _classes = (
 
 
 def register():
-    for cls in _classes:
-        bpy.utils.register_class(cls)
+    classes_register(_classes)
     bpy.types.WindowManager.wbp_depsgraph_inspector = bpy.props.PointerProperty(type=DepsgraphInspectorSettings)
 
 
@@ -404,5 +404,4 @@ def unregister():
     recording_set(False)
     recorder.clear()
     del bpy.types.WindowManager.wbp_depsgraph_inspector
-    for cls in reversed(_classes):
-        bpy.utils.unregister_class(cls)
+    classes_unregister(_classes)

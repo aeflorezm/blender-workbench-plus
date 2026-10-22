@@ -61,6 +61,54 @@ class RegistrationTest(unittest.TestCase):
         self.assertTrue(harness.addon_is_enabled())
 
 
+class FailedRegistrationTest(unittest.TestCase):
+    """A feature failing to register leaves nothing behind, so the add-on can be enabled again."""
+
+    def test_rollback(self):
+        harness.addon_enable()
+        addon = harness.addon_module()
+        feature = sys.modules[addon.__name__ + ".shelves"]
+        harness.addon_disable()
+
+        register = feature.register
+
+        def register_failing():
+            raise RuntimeError("Simulated failure")
+
+        feature.register = register_failing
+        try:
+            with self.assertRaises(RuntimeError):
+                addon.register()
+        finally:
+            feature.register = register
+
+        # Features registered before the failing one were unregistered, and so were the preferences.
+        self.assertFalse(addon.feature_is_registered("command_server"))
+        self.assertFalse(addon.WorkbenchPlusPreferences.is_registered)
+        self.assertFalse(hasattr(bpy.types, "WBP_OT_command_server_start"))
+
+        harness.addon_enable()
+        self.assertTrue(harness.addon_module().feature_is_registered("shelves"))
+        harness.addon_disable()
+
+    def test_classes_register_rolls_back(self):
+        harness.addon_enable()
+        utils = sys.modules[harness.ADDON_MODULE + ".utils"]
+
+        class WBP_OT_test_ok(bpy.types.Operator):
+            bl_idname = "wbp_test.ok"
+            bl_label = "OK"
+
+        class WBP_PT_test_broken(bpy.types.Panel):
+            bl_label = "Broken"
+            bl_space_type = 'NOT_A_SPACE'
+
+        with self.assertRaises(Exception):
+            utils.classes_register((WBP_OT_test_ok, WBP_PT_test_broken))
+        self.assertFalse(WBP_OT_test_ok.is_registered)
+        harness.addon_disable()
+
+
 class FeatureToggleTest(unittest.TestCase):
     """Each feature can be turned off and on from the preferences, independently of the others."""
 
