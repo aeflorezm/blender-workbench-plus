@@ -416,7 +416,9 @@ class WBP_PT_shelves(Panel):
 
         active = _active_shelf_index(context)
         row = layout.row(align=True)
-        flow = row.grid_flow(row_major=True, columns=0, even_columns=False, align=True)
+        # Tabs in rows of three: the sidebar is narrow, and an automatic layout puts one tab per row.
+        flow = row.grid_flow(row_major=True, columns=min(3, max(1, len(library.shelves))), even_columns=True,
+                             align=True)
         for index, shelf in enumerate(library.shelves):
             flow.operator(WBP_OT_shelf_activate.bl_idname, text=shelf["name"], depress=index == active).index = index
         row.operator(WBP_OT_shelf_add.bl_idname, text="", icon='ADD')
