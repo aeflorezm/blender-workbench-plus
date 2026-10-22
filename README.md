@@ -11,10 +11,10 @@ Workflow and pipeline tools for Blender, built to the same quality bar as Blende
 - **Command Server:** a built-in remote control server for Blender (JSON-RPC over localhost, token auth, structured errors, batching, notifications) for IDEs, pipelines and AI agents. See [Command Server](#command-server).
 - **Depsgraph Inspector:** see what gets re-evaluated, what the active object depends on, and how long each frame takes; export traces to Perfetto. See [Depsgraph Inspector](#depsgraph-inspector).
 - **Quick Attributes:** fast multi-object channel editing with virtual sliders. See [Quick Attributes](#quick-attributes).
+- **Shelves:** shareable button bars for your own scripts and operators. See [Shelves](#shelves).
 
 ## Planned features
 
-- **Shelves:** shareable button bars for your own scripts and operators.
 - **Script Editor with command echo:** see the Python behind every UI action.
 - **Driven Keys UI:** create driver relationships by posing, without writing expressions.
 
@@ -67,6 +67,17 @@ data-blocks points at suspects rather than splitting the time between them.
 - The ▾ button of each channel keys it, keys a breakdown, locks/unlocks it or mutes/unmutes its animation,
   on every selected object.
 - Numeric custom properties of the active object are listed too, with a button to copy each one to the selection.
+
+## Shelves
+
+*3D Viewport → Sidebar → Workbench → Shelves*
+
+- Tabs of buttons; each button runs an **operator** (with properties given as JSON) or a **Python script**,
+  with its own icon and tooltip. The gear icon shows the controls to rename, reorder and remove.
+- In the Text Editor, *right-click → Add to Shelf* turns the selected text (or the whole text) into a button.
+- Shelves are saved to `shelves.json` in the add-on's user directory after every change.
+  *Export* writes the shown shelf (or all of them) to a file that others can *Import*;
+  shelves with a name that already exists are renamed, or replaced with the *Replace* option.
 
 ## Development
 
