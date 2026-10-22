@@ -12,10 +12,10 @@ Workflow and pipeline tools for Blender, built to the same quality bar as Blende
 - **Depsgraph Inspector:** see what gets re-evaluated, what the active object depends on, and how long each frame takes; export traces to Perfetto. See [Depsgraph Inspector](#depsgraph-inspector).
 - **Quick Attributes:** fast multi-object channel editing with virtual sliders. See [Quick Attributes](#quick-attributes).
 - **Shelves:** shareable button bars for your own scripts and operators. See [Shelves](#shelves).
+- **Script Editor with command echo:** see the Python behind every UI action. See [Script Editor](#script-editor).
 
 ## Planned features
 
-- **Script Editor with command echo:** see the Python behind every UI action.
 - **Driven Keys UI:** create driver relationships by posing, without writing expressions.
 
 Most features ship as a regular **Blender extension** (works on stock Blender 5.2 LTS). Features that need core changes live in a separate Blender branch, and generally useful improvements are proposed upstream to Blender.
@@ -78,6 +78,19 @@ data-blocks points at suspects rather than splitting the time between them.
 - Shelves are saved to `shelves.json` in the add-on's user directory after every change.
   *Export* writes the shown shelf (or all of them) to a file that others can *Import*;
   shelves with a name that already exists are renamed, or replaced with the *Replace* option.
+
+## Script Editor
+
+*Text Editor → Sidebar → Workbench → Script Editor*
+
+- **Run Selection** (Ctrl Shift Enter) runs the selected lines, or the whole text, in a namespace kept between
+  runs (with `bpy`, `C` for the context and `D` for `bpy.data`). The code and its output or traceback are
+  written to the *Script Log* text, which can be edited and run again like any other text.
+- **Echo Operators** writes every operator run from the interface to the log as the Python call that repeats it.
+- **Echo Property Changes** writes changes of object location, rotation, scale and visibility, and of the
+  current frame, as Python assignments.
+
+The log is a regular text data-block, so it is saved with the file; clear it with the trash button.
 
 ## Development
 
