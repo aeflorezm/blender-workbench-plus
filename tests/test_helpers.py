@@ -173,6 +173,12 @@ class ReportCaptureTest(unittest.TestCase):
         self.assertEqual(reports[0].type, 'ERROR')
         self.assertIn("poll", reports[0].message)
 
+    def test_operator_call_property_named_operator(self):
+        # Operators may have a property called "operator" (or "args"): it must reach the operator.
+        result, reports = helpers.operator_call(lambda **kwargs: {kwargs["operator"]}, operator='FINISHED')
+        self.assertEqual(result, {'FINISHED'})
+        self.assertEqual(reports, [])
+
     def test_capture_restores_stdout(self):
         with helpers.capture_reports():
             pass

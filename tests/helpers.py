@@ -187,7 +187,7 @@ def capture_reports():
             reports.extend(_reports_parse(text))
 
 
-def operator_call(operator, *args, **kwargs):
+def operator_call(operator, /, *args, **kwargs):
     """
     Call ``operator`` (e.g. ``bpy.ops.object.select_all``) and return ``(result, reports)``.
 
