@@ -79,7 +79,9 @@ class CommandServerTestCase(unittest.TestCase):
     def setUp(self):
         harness.addon_enable()
         self.cs = sys.modules[harness.ADDON_MODULE + ".command_server"]
-        self.tempdir = tempfile.TemporaryDirectory()
+        # On Windows another process (e.g. a virus scanner) may briefly keep a just written file open,
+        # which makes the cleanup fail with "directory not empty": that must not fail the test.
+        self.tempdir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
         self.discovery_filepath = os.path.join(self.tempdir.name, "command_server.json")
         self.port = self.cs.server_start(discovery_filepath=self.discovery_filepath)
         with open(self.discovery_filepath, encoding="utf-8") as fh:
