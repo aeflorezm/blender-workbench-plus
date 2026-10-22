@@ -16,6 +16,7 @@ from bpy.props import BoolProperty, PointerProperty
 from bpy.types import AddonPreferences
 
 from . import command_server
+from .utils import classes_register, classes_unregister
 
 # Sub-module name, label and description of every feature, in display order.
 # Each one has a matching `use_<name>` toggle in the add-on preferences.
@@ -124,20 +125,23 @@ _settings_classes = (
 
 
 def register():
-    for cls in _settings_classes:
-        bpy.utils.register_class(cls)
-    bpy.utils.register_class(WorkbenchPlusPreferences)
+    classes_register((*_settings_classes, WorkbenchPlusPreferences))
 
     prefs = _preferences()
-    for name in FEATURE_NAMES:
-        if prefs is None or getattr(prefs, "use_" + name):
-            feature_register(name)
+    try:
+        for name in FEATURE_NAMES:
+            if prefs is None or getattr(prefs, "use_" + name):
+                feature_register(name)
+    except BaseException:
+        # Leave nothing registered, so that enabling the add-on again starts clean.
+        for name in reversed(FEATURE_NAMES):
+            feature_unregister(name)
+        classes_unregister((*_settings_classes, WorkbenchPlusPreferences))
+        raise
 
 
 def unregister():
     for name in reversed(FEATURE_NAMES):
         feature_unregister(name)
 
-    bpy.utils.unregister_class(WorkbenchPlusPreferences)
-    for cls in reversed(_settings_classes):
-        bpy.utils.unregister_class(cls)
+    classes_unregister((*_settings_classes, WorkbenchPlusPreferences))

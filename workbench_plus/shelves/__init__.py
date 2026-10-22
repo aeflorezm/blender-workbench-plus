@@ -25,7 +25,7 @@ from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
 from bpy.types import Operator, Panel, PropertyGroup
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
-from ..utils import selected_text
+from ..utils import classes_register, classes_unregister, selected_text
 from .library import Library, button_new
 
 ADDON_PACKAGE = __package__.rpartition(".")[0]
@@ -474,8 +474,7 @@ _classes = (
 
 
 def register():
-    for cls in _classes:
-        bpy.utils.register_class(cls)
+    classes_register(_classes)
     bpy.types.WindowManager.wbp_shelves = bpy.props.PointerProperty(type=ShelvesSettings)
     bpy.types.TEXT_MT_context_menu.append(_text_context_menu_draw)
     library_reload(library_filepath_default())
@@ -484,5 +483,4 @@ def register():
 def unregister():
     bpy.types.TEXT_MT_context_menu.remove(_text_context_menu_draw)
     del bpy.types.WindowManager.wbp_shelves
-    for cls in reversed(_classes):
-        bpy.utils.unregister_class(cls)
+    classes_unregister(_classes)

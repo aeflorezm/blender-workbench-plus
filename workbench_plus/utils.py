@@ -7,8 +7,34 @@ Helpers shared by several features.
 """
 
 __all__ = (
+    "classes_register",
+    "classes_unregister",
     "selected_text",
 )
+
+import bpy
+
+
+def classes_register(classes):
+    """
+    Register ``classes`` in order. When one fails, the ones already registered are unregistered
+    before the error is raised, so a failed registration leaves nothing behind.
+    """
+    registered = []
+    try:
+        for cls in classes:
+            bpy.utils.register_class(cls)
+            registered.append(cls)
+    except BaseException:
+        for cls in reversed(registered):
+            bpy.utils.unregister_class(cls)
+        raise
+
+
+def classes_unregister(classes):
+    """Unregister ``classes`` in reverse order."""
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
 
 
 def selected_text(text):
