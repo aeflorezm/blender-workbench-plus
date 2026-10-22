@@ -13,10 +13,7 @@ Workflow and pipeline tools for Blender, built to the same quality bar as Blende
 - **Quick Attributes:** fast multi-object channel editing with virtual sliders. See [Quick Attributes](#quick-attributes).
 - **Shelves:** shareable button bars for your own scripts and operators. See [Shelves](#shelves).
 - **Script Editor with command echo:** see the Python behind every UI action. See [Script Editor](#script-editor).
-
-## Planned features
-
-- **Driven Keys UI:** create driver relationships by posing, without writing expressions.
+- **Driven Keys:** create driver relationships by posing, without writing expressions. See [Driven Keys](#driven-keys).
 
 Most features ship as a regular **Blender extension** (works on stock Blender 5.2 LTS). Features that need core changes live in a separate Blender branch, and generally useful improvements are proposed upstream to Blender.
 
@@ -91,6 +88,19 @@ data-blocks points at suspects rather than splitting the time between them.
   current frame, as Python assignments.
 
 The log is a regular text data-block, so it is saved with the file; clear it with the trash button.
+
+## Driven Keys
+
+*3D Viewport → Sidebar → Workbench → Driven Keys*
+
+1. Choose the driver channel (e.g. *Rotation X*) and *Load Driver*: it uses the active object, or the active
+   bone in Pose Mode.
+2. Choose the driven channels and *Load Driven*: they use the other selected objects, or bones.
+3. Turn on *Posing*, pose the driver and the driven channels, and press *Key*. Repeat for each pose,
+   then turn *Posing* off: the driver now moves the driven channels, interpolating between the keyed poses.
+
+Each driven channel gets a regular Blender driver whose F-curve maps driver values to driven values, so it can
+also be refined in the Drivers editor. *Relationships* lists them, to load one again for more keys or remove it.
 
 ## Development
 
