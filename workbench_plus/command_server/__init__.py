@@ -14,6 +14,7 @@ __all__ = (
     "discovery_filepath_default",
     "draw_settings",
     "is_running",
+    "mcp_config",
     "register",
     "serve",
     "server_port",
@@ -27,12 +28,15 @@ __all__ = (
 import json
 import os
 import secrets
+import shlex
+import subprocess
+import sys
 import time
 import tomllib
 
 import bpy
 from bpy.app.handlers import persistent
-from bpy.props import BoolProperty, FloatProperty, IntProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty
 from bpy.types import Operator, PropertyGroup
 
 from ..utils import classes_register, classes_unregister
@@ -43,6 +47,8 @@ from .server import HOST, Server
 ADDON_PACKAGE = __package__.rpartition(".")[0]
 
 DISCOVERY_FILENAME = "command_server.json"
+
+MCP_SERVER_FILEPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mcp_server.py")
 
 # How often the timer executes queued requests when Blender runs with its interface (seconds).
 TIMER_INTERVAL = 0.002
@@ -220,6 +226,21 @@ def _timer():
     return TIMER_INTERVAL if _state is not None else None
 
 
+def mcp_config(kind='COMMAND'):
+    """
+    How to run the MCP server (``mcp_server.py``) for this Blender, with Blender's own Python.
+
+    :arg kind: ``'COMMAND'`` for a command line, ``'JSON'`` for an ``mcpServers`` configuration entry.
+    """
+    args = [MCP_SERVER_FILEPATH, "--discovery", discovery_filepath_default()]
+    if kind == 'JSON':
+        return json.dumps({"mcpServers": {"blender": {"command": sys.executable, "args": args}}}, indent=2)
+    if kind == 'COMMAND':
+        join = subprocess.list2cmdline if os.name == "nt" else shlex.join
+        return join([sys.executable, *args])
+    raise ValueError("Unknown kind: {!r}".format(kind))
+
+
 # -----------------------------------------------------------------------------
 # Events
 
@@ -362,6 +383,27 @@ class WBP_OT_command_server_serve(Operator):
         return {'FINISHED'}
 
 
+class WBP_OT_command_server_mcp_copy(Operator):
+    """Copy how to run the MCP server, so AI assistants that support the Model Context Protocol can use Blender"""
+    bl_idname = "wbp.command_server_mcp_copy"
+    bl_label = "Copy MCP Command"
+
+    kind: EnumProperty(
+        name="Kind",
+        description="What to copy",
+        items=(
+            ('COMMAND', "Command Line", "The command that runs the MCP server, to register it with an assistant"),
+            ('JSON', "JSON Configuration", "An \"mcpServers\" entry for assistants configured with a JSON file"),
+        ),
+    )
+
+    def execute(self, context):
+        context.window_manager.clipboard = mcp_config(self.kind)
+        self.report({'INFO'}, "Copied the MCP server {:s} to the clipboard".format(
+            "command" if self.kind == 'COMMAND' else "configuration"))
+        return {'FINISHED'}
+
+
 def draw_settings(layout, settings):
     """Draw the Command Server section of the add-on preferences."""
     col = layout.column()
@@ -374,12 +416,17 @@ def draw_settings(layout, settings):
         row.operator(WBP_OT_command_server_start.bl_idname, text="Start")
     col.prop(settings, "port")
     col.prop(settings, "use_autostart")
+    row = col.row(align=True)
+    row.label(text="MCP Server", icon='COPYDOWN')
+    row.operator(WBP_OT_command_server_mcp_copy.bl_idname, text="Copy Command").kind = 'COMMAND'
+    row.operator(WBP_OT_command_server_mcp_copy.bl_idname, text="Copy JSON").kind = 'JSON'
 
 
 _classes = (
     WBP_OT_command_server_start,
     WBP_OT_command_server_stop,
     WBP_OT_command_server_serve,
+    WBP_OT_command_server_mcp_copy,
 )
 
 

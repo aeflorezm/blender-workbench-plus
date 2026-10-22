@@ -53,6 +53,20 @@ with Client.from_discovery_file(ruta_a_command_server_json) as blender:
 El protocolo (métodos, valores, códigos de error, eventos) está en [`docs/command_server.md`](docs/command_server.md)
 (en inglés).
 
+### Asistentes de IA (MCP)
+
+El add-on incluye un servidor [MCP](https://modelcontextprotocol.io), para que los asistentes compatibles con el
+Model Context Protocol trabajen en el Blender abierto: resumir la escena, ejecutar Python, llamar operadores (con
+undo), leer y escribir propiedades y agrupar cambios en un solo paso de undo.
+
+1. Inicia el Command Server (ver arriba).
+2. En las mismas preferencias, *Copy Command* copia el comando que ejecuta el servidor MCP con el Python de
+   Blender; *Copy JSON* copia una entrada `mcpServers` para asistentes que se configuran con un archivo JSON.
+3. Regístralo en tu asistente, por ejemplo en Claude Code: `claude mcp add blender -- <comando pegado>`.
+
+El servidor MCP puede arrancar antes que Blender: cada llamada se conecta al servidor que esté corriendo en ese
+momento. Las herramientas están en [`docs/command_server.md`](docs/command_server.md#mcp-server).
+
 ## Depsgraph Inspector
 
 *3D Viewport → Sidebar → Workbench → Depsgraph Inspector*

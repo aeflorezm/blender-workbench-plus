@@ -171,7 +171,8 @@ class LifecycleTest(CommandServerTestCase):
         self.assertFalse(self.cs.is_running())
 
     def test_operators_registered(self):
-        for idname in ("command_server_start", "command_server_stop", "command_server_serve"):
+        for idname in (
+                "command_server_start", "command_server_stop", "command_server_serve", "command_server_mcp_copy"):
             with self.subTest(operator=idname):
                 self.assertTrue(hasattr(bpy.types, "WBP_OT_" + idname))
         # Only runs in background mode, which is the case here.
