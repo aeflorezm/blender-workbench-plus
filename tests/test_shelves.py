@@ -259,6 +259,7 @@ class TextSelectionTest(ShelvesTestCase):
     def setUp(self):
         super().setUp()
         self.text = bpy.data.texts.new("tool.py")
+        self.selected_text = sys.modules[harness.ADDON_MODULE + ".utils"].selected_text
         self.text.write("line one\nline two\nline three")
 
     def select(self, line_start, char_start, line_end, char_end):
@@ -269,19 +270,19 @@ class TextSelectionTest(ShelvesTestCase):
 
     def test_no_selection_is_whole_text(self):
         self.select(1, 2, 1, 2)
-        self.assertEqual(self.shelves.selected_text(self.text), "line one\nline two\nline three")
+        self.assertEqual(self.selected_text(self.text), "line one\nline two\nline three")
 
     def test_single_line(self):
         self.select(1, 5, 1, 8)
-        self.assertEqual(self.shelves.selected_text(self.text), "two")
+        self.assertEqual(self.selected_text(self.text), "two")
 
     def test_multi_line(self):
         self.select(0, 5, 2, 4)
-        self.assertEqual(self.shelves.selected_text(self.text), "one\nline two\nline")
+        self.assertEqual(self.selected_text(self.text), "one\nline two\nline")
 
     def test_backwards_selection(self):
         self.select(2, 4, 0, 5)
-        self.assertEqual(self.shelves.selected_text(self.text), "one\nline two\nline")
+        self.assertEqual(self.selected_text(self.text), "one\nline two\nline")
 
     def test_operator_needs_text_editor(self):
         self.assertFalse(bpy.ops.wbp.shelf_button_from_text.poll())

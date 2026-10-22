@@ -13,7 +13,6 @@ __all__ = (
     "library",
     "library_filepath_default",
     "register",
-    "selected_text",
     "unregister",
 )
 
@@ -26,6 +25,7 @@ from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
 from bpy.types import Operator, Panel, PropertyGroup
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
+from ..utils import selected_text
 from .library import Library, button_new
 
 ADDON_PACKAGE = __package__.rpartition(".")[0]
@@ -78,22 +78,6 @@ def _settings(context):
 def _active_shelf_index(context):
     index = _settings(context).active_shelf
     return index if _shelf_index_valid(index) else (0 if library.shelves else -1)
-
-
-def selected_text(text):
-    """The selected text of a Text data-block, or all of it when nothing is selected."""
-    start = (text.current_line_index, text.current_character)
-    end = (text.select_end_line_index, text.select_end_character)
-    if start == end:
-        return text.as_string()
-    if end < start:
-        start, end = end, start
-    lines = [line.body for line in text.lines[start[0]:end[0] + 1]]
-    if len(lines) == 1:
-        return lines[0][start[1]:end[1]]
-    lines[0] = lines[0][start[1]:]
-    lines[-1] = lines[-1][:end[1]]
-    return "\n".join(lines)
 
 
 class ShelvesSettings(PropertyGroup):
